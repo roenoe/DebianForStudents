@@ -7,7 +7,7 @@ apt install neovim git vsftpd curl wget sudo
 usermod -aG sudo im
 
 # Set correct ftp options
-rm /etc/vsftp.conf
+rm /etc/vsftpd.conf
 cp etc-vsftpd.conf /etc/vsftpd.conf
 systemctl restart vsftpd
 
