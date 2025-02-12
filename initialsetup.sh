@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Install necessary software
+apt install neovim git vsftpd curl wget sudo
+
+# Add default user "im" to sudo user group
+usermod -aG sudo im
+
+# Set correct ftp options
+rm /etc/vsftpd.conf
+cp etc-vsftpd.conf /etc/vsftpd.conf
+systemctl restart vsftpd
+
+# Reset the network interfaces
+rm /etc/network/interfaces
+cp etc-network-interfaces /etc/network/interfaces
+
 # Set the correct IP address (or just one at all)
 while [[ ! $confirm =~ [Yy]$ ]]
 do
@@ -10,7 +25,7 @@ do
   read -p "Is this correct? [y/n]" -n 1 -r confirm
   echo
 done
-echo "This devices IP address is now $IP. To change this, edit the bottom line of /etc/network/interfaces"
+echo "This devices IP address is now $IP. To change this, simply rerun this setup script, or edit the bottom line of /etc/network/interfaces"
 
 # Actually set it
 echo "  address $IP" >> /etc/network/interfaces
@@ -22,12 +37,8 @@ ifup ens18
 passwd --expire im
 
 # Delete old ssh keys
-confirm="n"
-read -p "Are you sure you want to regenerate your ssh keys?" -n 1 -r confirm
-if [[ $confirm =~ [Yy]$ ]]
-then
-  /bin/rm -v /etc/ssh/ssh_host_*
-  dpkg-reconfigure openssh-server
-  systemctl restart ssh
-fi
+echo "Regenerating ssh keys"
+/bin/rm -v /etc/ssh/ssh_host_*
+dpkg-reconfigure openssh-server
+systemctl restart ssh
 
